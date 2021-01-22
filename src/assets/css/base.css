@@ -1,0 +1,7 @@
+@import './normalize.css';
+
+body {
+  padding: 0;
+  margin-top: 20px;
+  margin-left: 0;
+}
