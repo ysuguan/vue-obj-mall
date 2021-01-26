@@ -1,5 +1,5 @@
 <template>
-  <div class='home-navi-bar'>
+  <div>
     <navi-bar>
       <template v-slot:left>
         <div>
@@ -29,10 +29,3 @@ export default {
   }
 }
 </script>
-<style scoped>
-  .home-navi-bar {
-    margin-top: 0;
-    color: white;
-    background-color: gray;
-  }
-</style>
