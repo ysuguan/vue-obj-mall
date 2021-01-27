@@ -1,113 +1,17 @@
 <template>
   <div id="home">
     <home-navi-bar class='home-nav'></home-navi-bar>
-    <home-swiper :banner='banner'></home-swiper>
-    <home-recommend :recommend="recommend"/>
-    <home-feature></home-feature>
-    <type-control :goods-types='goodsTypes' @typeControlClick='typeControlClick'></type-control>
-    <goods-list :goods='currentGoods' ::key="currentType"/>
-    <ul>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-      <li>100</li>
-    </ul>
+    <mall-scroll @pullingUp="pullingUp" class="scroll-wrapper"
+     ref="wrapper"
+      :scroll-position-func="scrollPositionFunc"
+       @positionChanged='positionChanged'>
+      <home-swiper :banner='banner'></home-swiper>
+      <home-recommend :recommend="recommend"/>
+      <home-feature></home-feature>
+      <type-control :goods-types='goodsTypes' @typeControlClick='typeControlClick'></type-control>
+      <goods-list :goods='currentGoods' :key="currentType"/>
+    </mall-scroll>
+    <back-top class="back-top" v-show="backAlive" @backToTop="backToTop"></back-top>
   </div>
 </template>
 
@@ -119,7 +23,8 @@ import HomeFeature from './children/HomeFeature';
 
 import TypeControl from 'components/content/TypeControl';
 import GoodsList from 'components/content/goods/GoodsList';
-
+import MallScroll from 'components/common/scroll/MallScroll';
+import BackTop from 'components/common/backtop/BackTop';
 
 import { getMultiData, getHomeData } from "network/HomeRequest";
 
@@ -132,7 +37,9 @@ export default {
     HomeFeature,
 
     TypeControl,
-    GoodsList
+    GoodsList,
+    MallScroll,
+    BackTop
   },
   data() {
     return {
@@ -153,7 +60,13 @@ export default {
           list: []
         }
       },
-      currentType: ''
+      currentType: '',
+      backAlive: false,
+      scrollPositionFunc: (position) => {
+        if(-position.y > 1000){
+          this.$emit('showBack');
+        }
+      }
     }
   },
   computed: {
@@ -172,7 +85,9 @@ export default {
   created() {
     //发起网络请求
     this.getMultiData();
-    this.getGoodsList();
+    for (const item in this.goodsList) {
+      this.getGoodsList(item);
+    }
   },
   methods: {
     getMultiData() {
@@ -181,18 +96,31 @@ export default {
         this.recommend = res.data.data.recommend.list;
       });
     },
-    getGoodsList(){
-      for (const item in this.goodsList) {
-        this.goodsList[item].page++ ;
-        getHomeData(item, this.goodsList[item].page).then(res => {
-          this.goodsList[item].list.push(...res.data.data.list);
+    getGoodsList(goodsType){
+        getHomeData(goodsType, this.goodsList[goodsType].page).then(res => {
+          this.goodsList[goodsType].list.push(...res.data.data.list);
         });
-      }
+        this.goodsList[goodsType].page++;
     },
 
 
     typeControlClick(goodsType) {
       this.currentType = goodsType;
+    },
+
+    
+    pullingUp(){
+      // getHomeData(this.currentType, this.goodsList[this.currentType].page).then(res => {
+      //   this.goodsList[item]
+      // })
+      this.getGoodsList(this.currentType);
+      this.$refs.wrapper.scroll.refresh();
+    },
+    positionChanged(position) {
+      this.backAlive = (-position.y > 1000)?true: false;
+    },
+    backToTop() {
+      this.$refs.wrapper.scroll.scrollTo(0,-300, 1000);
     }
   }
 }
@@ -205,8 +133,27 @@ export default {
     top: 0px;
     z-index: 9;
   }
-  .type-control {
+  .scroll-wrapper {
+    overflow: hidden;
+
+    position: absolute;
+    top: 44px;
+    bottom: 49px;
+    left: 0;
+    right: 0;
+  }
+
+  .back-top {
+    position: absolute;
+    right: 10px;
+    bottom: 50px;
+
+    height: 9%;
+    width: 18%;
+  }
+
+  /* .type-control {
     position: sticky;
     top: 44px;
-  }
+  } */
 </style>

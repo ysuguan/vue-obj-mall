@@ -9,6 +9,7 @@ export function getMultiData(){
 }
 
 export function getHomeData(type, page){
+  page++;
   const config = {
     url: '/home/data',
     type: 'get',
