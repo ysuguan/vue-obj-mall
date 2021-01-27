@@ -8,13 +8,13 @@ export function getMultiData(){
   return baseRequest(config);
 }
 
-export function getHomeData(type){
+export function getHomeData(type, page){
   const config = {
     url: '/home/data',
     type: 'get',
     params: {
       type,
-      page: 1
+      page
     }
   };
   return baseRequest(config);

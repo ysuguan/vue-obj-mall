@@ -4,7 +4,8 @@
     <home-swiper :banner='banner'></home-swiper>
     <home-recommend :recommend="recommend"/>
     <home-feature></home-feature>
-    <type-control :goods-types='goodsTypes'></type-control>
+    <type-control :goods-types='goodsTypes' @typeControlClick='typeControlClick'></type-control>
+    <goods-list :goods='currentGoods' ::key="currentType"/>
     <ul>
       <li>100</li>
       <li>100</li>
@@ -117,6 +118,8 @@ import HomeSwiper from './children/HomeSwiper';
 import HomeFeature from './children/HomeFeature';
 
 import TypeControl from 'components/content/TypeControl';
+import GoodsList from 'components/content/goods/GoodsList';
+
 
 import { getMultiData, getHomeData } from "network/HomeRequest";
 
@@ -128,7 +131,8 @@ export default {
     HomeSwiper,
     HomeFeature,
 
-    TypeControl
+    TypeControl,
+    GoodsList
   },
   data() {
     return {
@@ -136,16 +140,33 @@ export default {
       banner: [],
       recommend: [],
       goodsList: {
-        'pop': [],
-        'new': [],
-        'sell': []
-      }
+        'pop': {
+          page: 0,
+          list: []
+        },
+        'new': {
+          page: 0,
+          list: []
+        },
+        'sell': {
+          page: 0,
+          list: []
+        }
+      },
+      currentType: ''
     }
   },
   computed: {
     //提取所有类型传递到子组件featuretabbar
     goodsTypes() {
       return Object.keys(this.goodsList);
+    },
+    currentGoods() {
+      if(this.currentType === '')
+      {
+        this.currentType = this.goodsTypes[0];
+      }
+      return this.goodsList[this.currentType].list;
     }
   },
   created() {
@@ -162,11 +183,16 @@ export default {
     },
     getGoodsList(){
       for (const item in this.goodsList) {
-        getHomeData(item).then(res => {
-          this.goodsList[item] = res.data.data.list;
+        this.goodsList[item].page++ ;
+        getHomeData(item, this.goodsList[item].page).then(res => {
+          this.goodsList[item].list.push(...res.data.data.list);
         });
       }
-      console.log(this.goodsList);
+    },
+
+
+    typeControlClick(goodsType) {
+      this.currentType = goodsType;
     }
   }
 }
