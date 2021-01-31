@@ -24,7 +24,8 @@ export default {
   },
   mounted() {
     //延迟挂载wrapper，否则content尺寸计算会因为图片加载延时出错
-    setTimeout(this.useBScroll, 1500);
+    // setTimeout(this.useBScroll, 1500);
+    this.useBScroll;
   },
   methods: {
     useBScroll() {

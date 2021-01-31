@@ -5,9 +5,9 @@
      ref="wrapper"
       :scroll-position-func="scrollPositionFunc"
        @positionChanged='positionChanged'>
-      <home-swiper :banner='banner'></home-swiper>
-      <home-recommend :recommend="recommend"/>
-      <home-feature></home-feature>
+      <home-swiper :banner='banner' @imageLoaded='imageLoaded'></home-swiper>
+      <home-recommend :recommend="recommend" @imageLoaded='imageLoaded'/>
+      <home-feature @imageLoaded='imageLoaded'></home-feature>
       <type-control :goods-types='goodsTypes' @typeControlClick='typeControlClick'></type-control>
       <goods-list :goods='currentGoods' :key="currentType"/>
     </mall-scroll>
@@ -121,6 +121,9 @@ export default {
     },
     backToTop() {
       this.$refs.wrapper.scroll.scrollTo(0,-300, 1000);
+    },
+    debounce(func, delay){
+      //
     }
   }
 }

@@ -1,13 +1,16 @@
 <template>
   <div class="feature">
     <a href="https://act.mogujie.com/zzlx67">
-      <img src="~assets/img/home/recommend_bg.jpg">
+      <img src="~assets/img/home/recommend_bg.jpg" @load='imageLoaded'>
     </a>
   </div>
 </template>
 <script>
+import HomeCommonFunc from './HomeCommonFunc';
+
 export default {
-  name: 'HomeFeature'
+  name: 'HomeFeature',
+  extends: HomeCommonFunc
 }
 </script>
 <style scoped>

@@ -1,16 +1,19 @@
 <template>
   <div class='home-recommend'> 
-    <div v-for="item in recommend" class="recommend-item">
+    <div v-for="(item,index) in recommend" class="recommend-item" :key='index'>
       <a :href="item.link">
-        <img :src="item.image" alt="">
+        <img :src="item.image" @load='imageLoaded'>
         <div>{{item.title}}</div> 
       </a>
     </div>
   </div>
 </template>
 <script>
+import HomeCommonFunc from './HomeCommonFunc';
+
 export default {
   name: 'HomeRecommend',
+  extends: HomeCommonFunc,
   props: {
     recommend: {
       type: Array,
